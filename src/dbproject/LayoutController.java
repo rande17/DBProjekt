@@ -67,7 +67,6 @@ public class LayoutController implements Initializable {
     }
 
     private void dbQuery(String sql, int outputs, String args) {
-        System.out.println(sql.replace("?", args));
         String results = "";
         try {
             Class.forName("org.postgresql.Driver");
@@ -81,6 +80,7 @@ public class LayoutController implements Initializable {
 
             PreparedStatement st = db.prepareStatement(sql);
             if (args != null) {
+                System.out.println(sql.replace("?", args));
                 try {
                     st.setString(2, args);
                     st.setString(1, args);

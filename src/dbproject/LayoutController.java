@@ -8,6 +8,7 @@ package dbproject;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ResourceBundle;
@@ -17,6 +18,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import org.postgresql.util.PSQLException;
 
 /**
  * FXML Controller class
@@ -24,11 +26,11 @@ import javafx.scene.control.TextField;
  * @author rickie
  */
 public class LayoutController implements Initializable {
-    
+
     String dburl = "jdbc:postgresql://horton.elephantsql.com:5432/pjuckfbw";
     String username = "pjuckfbw";
     String password = "7BpKJanLBglXhFEs0maW4C0i5c5AyyND";
-    
+
     @FXML
     private Button searchCoach;
     @FXML
@@ -63,9 +65,9 @@ public class LayoutController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
     }
-    
-    private void dbQuery(String sql, int outputs) {
-        System.out.println(sql);
+
+    private void dbQuery(String sql, int outputs, String args) {
+        System.out.println(sql.replace("?", args));
         String results = "";
         try {
             Class.forName("org.postgresql.Driver");
@@ -73,12 +75,20 @@ public class LayoutController implements Initializable {
             results = "DB class not found";
             System.out.println(e);
         }
-        
+
         try {
             Connection db = DriverManager.getConnection(dburl, username, password);
-            
-            Statement st = db.createStatement();
-            ResultSet rs = st.executeQuery(sql);
+
+            PreparedStatement st = db.prepareStatement(sql);
+            if (args != null) {
+                try {
+                    st.setString(2, args);
+                    st.setString(1, args);
+                } catch (PSQLException e) {
+                    st.setString(1, args);
+                }
+            }
+            ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 for (int i = 1; i <= outputs; i++) {
                     if (i != outputs) {
@@ -91,59 +101,59 @@ public class LayoutController implements Initializable {
             rs.close();
             st.close();
             db.close();
-            
+
         } catch (Exception e) {
             results = "Failure in DB query";
             System.out.println(e);
         }
         output.setText(results);
     }
-    
+
+    @FXML
+    private void allCoaches(ActionEvent event) {
+        dbQuery("SELECT DISTINCT(name), CONCAT('Coach: ', couch) FROM Teams", 2, null);
+    }
+
+    @FXML
+    private void allWinning(ActionEvent event) {
+        dbQuery("SELECT People.email FROM People INNER JOIN Teams ON People.name = Teams.Player INNER JOIN Tournaments ON Teams.name = Tournaments.teams WHERE Tournaments.winner = Teams.name UNION SELECT DISTINCT(couch) FROM Teams INNER JOIN Tournaments ON Teams.name = Tournaments.teams WHERE Tournaments.winner = Teams.name", 1, null);
+    }
+
+    @FXML
+    private void allTeams(ActionEvent event) {
+        dbQuery("SELECT name, CONCAT('Players: ', COUNT(name)) FROM Teams GROUP BY name", 2, null);
+    }
+
+    @FXML
+    private void allTournaments(ActionEvent event) {
+        dbQuery("SELECT DISTINCT(name) FROM Tournaments", 1, null);
+    }
+
+    @FXML
+    private void searchCoach(ActionEvent event) {
+        dbQuery("SELECT DISTINCT(name), CONCAT('Coach: ', couch) FROM Teams WHERE UPPER(couch) LIKE UPPER(CONCAT('%', ? , '%'))", 2, textCoach.getText());
+    }
+
+    @FXML
+    private void searchWinner(ActionEvent event) {
+        dbQuery("SELECT People.email FROM People INNER JOIN Teams ON People.name = Teams.Player INNER JOIN Tournaments ON Teams.name = Tournaments.teams WHERE Tournaments.winner LIKE Teams.name AND UPPER(People.email) LIKE UPPER(CONCAT('%', ? , '%')) UNION SELECT DISTINCT(couch) FROM Teams INNER JOIN Tournaments ON Teams.name LIKE Tournaments.teams WHERE Tournaments.winner = Teams.name AND UPPER(Teams.couch) LIKE UPPER(CONCAT('%', ? , '%'))", 1, textWinner.getText());
+    }
+
+    @FXML
+    private void searchTeam(ActionEvent event) {
+        dbQuery("SELECT name, CONCAT('Players: ', COUNT(name)) FROM Teams WHERE UPPER(name) LIKE UPPER(CONCAT('%', ? , '%')) GROUP BY name", 2, textTeam.getText());
+    }
+
     @FXML
     private void searchTournament(ActionEvent event) {
         int numberOfTeams;
         try {
             numberOfTeams = Integer.parseInt(textTournament.getText());
-            dbQuery("SELECT DISTINCT(name) FROM Tournaments GROUP by name HAVING count(teams) >= " + numberOfTeams, 1);
+            dbQuery("SELECT DISTINCT(name) FROM Tournaments GROUP by name HAVING count(teams) >= CAST(? AS integer)", 1, "" + numberOfTeams);
         } catch (NumberFormatException e) {
             output.setText("That was not a number");
         }
-        
+
     }
-    
-    @FXML
-    private void allCoaches(ActionEvent event) {
-        dbQuery("SELECT DISTINCT(name), CONCAT('Coach: ', couch) FROM Teams", 2);
-    }
-    
-    @FXML
-    private void allWinning(ActionEvent event) {
-        dbQuery("SELECT People.email FROM People INNER JOIN Teams ON People.name = Teams.Player INNER JOIN Tournaments ON Teams.name = Tournaments.teams WHERE Tournaments.winner = Teams.name UNION SELECT DISTINCT(couch) FROM Teams INNER JOIN Tournaments ON Teams.name = Tournaments.teams WHERE Tournaments.winner = Teams.name", 1);
-    }
-    
-    @FXML
-    private void allTeams(ActionEvent event) {
-        dbQuery("SELECT name, CONCAT('Players: ', COUNT(name)) FROM Teams GROUP BY name", 2);
-    }
-    
-    @FXML
-    private void allTournaments(ActionEvent event) {
-        dbQuery("SELECT DISTINCT(name) FROM Tournaments", 1);
-    }
-    
-    @FXML
-    private void searchCoach(ActionEvent event) {
-        dbQuery("SELECT DISTINCT(name), CONCAT('Coach: ', couch) FROM Teams WHERE UPPER(couch) LIKE UPPER('%" + textCoach.getText() + "%')", 2);        
-    }
-    
-    @FXML
-    private void searchWinner(ActionEvent event) {
-        dbQuery("SELECT People.email FROM People INNER JOIN Teams ON People.name = Teams.Player INNER JOIN Tournaments ON Teams.name = Tournaments.teams WHERE Tournaments.winner LIKE Teams.name AND UPPER(People.email) LIKE UPPER('%" + textWinner.getText() + "%') UNION SELECT DISTINCT(couch) FROM Teams INNER JOIN Tournaments ON Teams.name LIKE Tournaments.teams WHERE Tournaments.winner = Teams.name AND UPPER(Teams.couch) LIKE UPPER('%" + textWinner.getText() + "%')", 1);
-    }
-    
-    @FXML
-    private void searchTeam(ActionEvent event) {
-        dbQuery("SELECT name, CONCAT('Players: ', COUNT(name)) FROM Teams WHERE UPPER(name) LIKE UPPER('%" + textTeam.getText() + "%') GROUP BY name", 2);        
-    }
-    
+
 }

@@ -6,24 +6,24 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dbproject.LayoutController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="636.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dbproject.LayoutController">
    <children>
       <Button fx:id="searchCoach" layoutX="300.0" layoutY="48.0" mnemonicParsing="false" onAction="#searchCoach" text="Search" />
       <Pane layoutX="380.0" layoutY="48.0">
          <children>
-            <Button fx:id="allCoaches" mnemonicParsing="false" onAction="#allCoaches" prefHeight="25.0" prefWidth="150.0" text="List All Coaches" />
-            <Button fx:id="allWinning" layoutY="46.0" mnemonicParsing="false" onAction="#allWinning" text="List All Winning Teams" />
-            <Button fx:id="allTeams" layoutY="94.0" mnemonicParsing="false" onAction="#allTeams" prefHeight="25.0" prefWidth="150.0" text="List All Teams" />
-            <Button fx:id="allTournaments" layoutY="146.0" mnemonicParsing="false" onAction="#allTournaments" prefHeight="25.0" prefWidth="150.0" text="List All Tournaments" />
+            <Button fx:id="allCoaches" mnemonicParsing="false" onAction="#allCoaches" prefHeight="25.0" prefWidth="250.0" text="List All Coaches" />
+            <Button fx:id="allWinning" layoutY="46.0" mnemonicParsing="false" onAction="#allWinning" text="List All Winning Players/Coaches On A Team" />
+            <Button fx:id="allTeams" layoutY="94.0" mnemonicParsing="false" onAction="#allTeams" prefHeight="25.0" prefWidth="250.0" text="List All Teams" />
+            <Button fx:id="allTournaments" layoutY="146.0" mnemonicParsing="false" onAction="#allTournaments" prefHeight="25.0" prefWidth="251.0" text="List All Tournaments" />
          </children>
       </Pane>
       <TextField fx:id="textCoach" layoutX="56.0" layoutY="48.0" prefHeight="25.0" prefWidth="218.0" promptText="Enter Coach Name" />
       <Button fx:id="searchWinning" layoutX="300.0" layoutY="94.0" mnemonicParsing="false" onAction="#searchWinner" text="Search" />
-      <TextField fx:id="textWinner" layoutX="56.0" layoutY="94.0" prefHeight="25.0" prefWidth="218.0" promptText="Enter Winner Team" />
+      <TextField fx:id="textWinner" layoutX="56.0" layoutY="94.0" prefHeight="25.0" prefWidth="218.0" promptText="Enter Winner Player/Coach" />
       <Button fx:id="searchTeam" layoutX="300.0" layoutY="142.0" mnemonicParsing="false" onAction="#searchTeam" text="Search" />
       <TextField fx:id="textTeam" layoutX="56.0" layoutY="142.0" prefHeight="25.0" prefWidth="218.0" promptText="Enter Team Name" />
       <Button fx:id="searchTournament" layoutX="300.0" layoutY="194.0" mnemonicParsing="false" onAction="#searchTournament" text="Search" />
       <TextField fx:id="textTournament" layoutX="56.0" layoutY="194.0" prefHeight="25.0" prefWidth="218.0" promptText="Enter Numer of paticipationg teams" />
-                  <TextArea fx:id="output" layoutX="56.0" layoutY="232.0" prefHeight="154.0" prefWidth="474.0" />
+                  <TextArea fx:id="output" editable="false" layoutX="56.0" layoutY="232.0" prefHeight="154.0" prefWidth="474.0" />
    </children>
 </AnchorPane>

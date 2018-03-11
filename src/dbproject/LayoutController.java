@@ -109,21 +109,26 @@ public class LayoutController implements Initializable {
         output.setText(results);
     }
 
+    // Here it selects only the names from Teams and Coachs(couch), and puts it into one string output
     @FXML
     private void allCoaches(ActionEvent event) {
         dbQuery("SELECT DISTINCT(name), CONCAT('Coach: ', couch) FROM Teams", 2, null);
     }
 
+    // people.email is people.nickname, and the other way around.
+    // It selects the nicknames from people, and then it looks into Teams so it can go into Tournaments, so that it can find out whether or not the Team/people are currently on a team, and whether that team has won or not.
     @FXML
     private void allWinning(ActionEvent event) {
         dbQuery("SELECT People.email FROM People INNER JOIN Teams ON People.name = Teams.Player INNER JOIN Tournaments ON Teams.name = Tournaments.teams WHERE Tournaments.winner = Teams.name UNION SELECT DISTINCT(couch) FROM Teams INNER JOIN Tournaments ON Teams.name = Tournaments.teams WHERE Tournaments.winner = Teams.name", 1, null);
     }
 
+    // Here it selects the name of the team, and then it counts the amount of names on the team, and then it prints out the Name of the team and the number of names/player+coachs on the team.
     @FXML
     private void allTeams(ActionEvent event) {
         dbQuery("SELECT name, CONCAT('Players: ', COUNT(name)) FROM Teams GROUP BY name", 2, null);
     }
 
+    
     @FXML
     private void allTournaments(ActionEvent event) {
         dbQuery("SELECT DISTINCT(name) FROM Tournaments", 1, null);
